@@ -22,7 +22,6 @@ class TableViewController: UITableViewController {
         if let items = defaults.array(forKey: "TodoListArray") as? [String] {
             itemArray = items
         }
-
     
     }
 
