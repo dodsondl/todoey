@@ -15,12 +15,15 @@ class TableViewController: UITableViewController {
     let defaults = UserDefaults.standard
     
     var cellIsSelected = false
+    
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-     
-        
+    
+        loadItems()
         
         
         //if let items = defaults.array(forKey: "TodoListArray") as? [String] {
@@ -58,7 +61,7 @@ class TableViewController: UITableViewController {
         
       itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-     tableView.reloadData()
+    saveItems()
         
         tableView.deselectRow(at: indexPath, animated: true)
 
@@ -76,7 +79,9 @@ class TableViewController: UITableViewController {
             
             newItem.title = textField.text!
             self.itemArray.append(newItem)
-              self.tableView.reloadData()
+            
+           self.saveItems()
+            
         }
         
         alert.addTextField { (alertTextField) in
@@ -88,5 +93,31 @@ class TableViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    func saveItems() {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: self.dataFilePath!)
+        }
+        catch {
+            print("error encode")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+            itemArray = try decoder.decode([Item].self, from: data)
+        }
+        catch {
+            print("error")
+        }
+    }
+    
 }
 
+}
